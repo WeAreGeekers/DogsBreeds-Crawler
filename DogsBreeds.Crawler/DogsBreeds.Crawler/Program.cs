@@ -1,12 +1,8 @@
-﻿
+﻿using WeAreGeekers.DogsBreeds.Crawler.Extractors;
+using WeAreGeekers.DogsBreeds.Crawler.Responses;
 
-using WeAreGeekers.DogsBreeds.Crawler.Extractors;
+// Extract fci data
+List<ResponseBreedDetailData> listBreedDetailData = FciExtractor.ExtractFromFciBreedDetailData();
 
-// Extract Fci data
-var listFciBreedGroups = FciExtractor.ExtractFciGroup();
-var listFciBreeds = FciExtractor.ExtractFciBreed(listFciBreedGroups);
-
-
-
-// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+// Write breeds.json & csv (how to write array in csv? With '|'? Idk)
+// TODO: 
