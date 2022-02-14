@@ -17,7 +17,6 @@ namespace WeAreGeekers.DogsBreeds.Crawler.Extractors
             List<ResponseBreed> listBreeds = ExtractFciBreeds(listBreedSections.ToList());
 
             // TODO:
-            // 2. Check cabib from sections
             // 3. Extract provisional breeds
             // 4. Map breeds into 'DetailData' (create its folder under 'responses')
             // 5. Manager all data (need to be clear) and translations (need iso lang)
@@ -80,10 +79,22 @@ namespace WeAreGeekers.DogsBreeds.Crawler.Extractors
                             Group = group,
                             SectionIndex = int.Parse(section.Descendants("span").FirstOrDefault().Descendants("b").FirstOrDefault().InnerText.ToUpper().Replace("SECTION", string.Empty).Replace(":", string.Empty).Trim()),
                             OfficialName = section.Descendants("span").FirstOrDefault().InnerText,
-                            BreedDetailsPages = section
+                            Breeds = section
                                 .Descendants("a")
                                 .Where(w => w.HasClass("nom"))
-                                .Select(breedATag => "http://fci.be" + breedATag.GetAttributeValue<string>("href", string.Empty))
+                                .Select(breedATag =>
+                                {
+                                    ResponseBreed breed = new ResponseBreed()
+                                    {
+                                        DetailPage = "http://fci.be" + breedATag.GetAttributeValue<string>("href", string.Empty),
+                                        Cacib = breedATag.ParentNode.ParentNode.Descendants("td")?
+                                            .Where(w => w.HasClass("racecacib")).FirstOrDefault()?
+                                            .Element("span")?
+                                            .InnerText == "*"
+                                    };
+
+                                    return breed;
+                                })
                                 .ToList()
                         };
 
@@ -100,7 +111,6 @@ namespace WeAreGeekers.DogsBreeds.Crawler.Extractors
                                     OfficialName = s.Descendants("span").FirstOrDefault().InnerText,
                                     SubSectionIndex = 0,
                                 };
-                               
 
                                 // Clear data                                
                                 responseBreedSubSection.SubSectionIndex = int.Parse(
@@ -142,18 +152,24 @@ namespace WeAreGeekers.DogsBreeds.Crawler.Extractors
                 .ForEach(breedSection =>
                 {
                     breedSection
-                        .BreedDetailsPages
-                        .ForEach(detailPage =>
+                        .Breeds
+                        .ForEach(breed =>
                         {
                             // Download section detail pages
                             var web = new HtmlWeb();
-                            var doc = web.Load(detailPage);
+                            var doc = web.Load(breed.DetailPage);
 
                             // Prepare response
                             ResponseBreed responseBreed = new ResponseBreed();
 
                             // get section
                             responseBreed.Section = breedSection;
+
+                            // get detail page
+                            responseBreed.DetailPage = breed.DetailPage;
+
+                            // get cacib
+                            responseBreed.Cacib = breed.Cacib;
 
                             // get fci code
                             responseBreed.FciCode = doc.DocumentNode

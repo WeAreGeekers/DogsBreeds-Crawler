@@ -80,6 +80,16 @@
         public string DevelopmentCountry { get; set; }
 
         /// <summary>
+        /// If breed it's cacib (in case of varieties cacib can be false on breed, but true on variety)
+        /// </summary>
+        public bool Cacib { get; set; }
+
+        /// <summary>
+        /// Detail page of breed
+        /// </summary>
+        public string DetailPage { get; set; }
+
+        /// <summary>
         /// Breed is enable for working trial
         /// </summary>
         public ResponseBreedWorkingTrial WorkingTrial { get; set; }

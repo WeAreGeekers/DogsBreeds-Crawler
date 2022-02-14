@@ -25,9 +25,9 @@
         public string OfficialName { get; set; }
 
         /// <summary>
-        /// List of details pages of breeds under this breed section
+        /// List of breeds under this breed section
         /// </summary>
-        public List<string> BreedDetailsPages { get; set; }
+        public List<ResponseBreed> Breeds { get; set; }
 
         /// <summary>
         /// List of sub section of this breed section
