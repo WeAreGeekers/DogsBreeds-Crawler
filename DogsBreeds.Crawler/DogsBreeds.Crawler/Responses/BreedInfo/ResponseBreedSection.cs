@@ -29,6 +29,11 @@
         /// </summary>
         public List<string> BreedDetailsPages { get; set; }
 
+        /// <summary>
+        /// List of sub section of this breed section
+        /// </summary>
+        public List<ResponseBreedSubSection> SubSections { get; set; }
+
         #endregion
     }
 

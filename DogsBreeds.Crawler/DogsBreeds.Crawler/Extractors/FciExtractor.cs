@@ -17,7 +17,6 @@ namespace WeAreGeekers.DogsBreeds.Crawler.Extractors
             List<ResponseBreed> listBreeds = ExtractFciBreeds(listBreedSections.ToList());
 
             // TODO:
-            // 1. Check all data in every pages
             // 2. Check cabib from sections
             // 3. Extract provisional breeds
             // 4. Map breeds into 'DetailData' (create its folder under 'responses')
@@ -88,6 +87,35 @@ namespace WeAreGeekers.DogsBreeds.Crawler.Extractors
                                 .ToList()
                         };
 
+                        // sub-section
+                        breedSection.SubSections = section
+                            .Descendants("ul")
+                            .Where(w => w.HasClass("soussections"))
+                            .SelectMany(s => s.Elements("li"))
+                            .Select(s =>
+                            {
+                                ResponseBreedSubSection responseBreedSubSection = new ResponseBreedSubSection()
+                                {
+                                    Section = breedSection,
+                                    OfficialName = s.Descendants("span").FirstOrDefault().InnerText,
+                                    SubSectionIndex = 0,
+                                };
+                               
+
+                                // Clear data                                
+                                responseBreedSubSection.SubSectionIndex = int.Parse(
+                                    responseBreedSubSection.OfficialName
+                                        .Substring(0, responseBreedSubSection.OfficialName.IndexOf(' '))
+                                        .Replace(breedSection.SectionIndex + ".", string.Empty)
+                                        .Trim()
+                                );
+                                responseBreedSubSection.OfficialName = responseBreedSubSection.OfficialName.Substring(responseBreedSubSection.OfficialName.IndexOf(' ')).Trim();
+
+                                // Ret data
+                                return responseBreedSubSection;
+                            })
+                            .ToList();
+
                         // Clear official name
                         breedSection.OfficialName = breedSection.OfficialName.Substring(breedSection.OfficialName.IndexOf(":") + 1).Trim();
 
@@ -123,6 +151,9 @@ namespace WeAreGeekers.DogsBreeds.Crawler.Extractors
 
                             // Prepare response
                             ResponseBreed responseBreed = new ResponseBreed();
+
+                            // get section
+                            responseBreed.Section = breedSection;
 
                             // get fci code
                             responseBreed.FciCode = doc.DocumentNode
@@ -185,142 +216,136 @@ namespace WeAreGeekers.DogsBreeds.Crawler.Extractors
                                 })
                                 .ToList();
 
-                            // get date acceptance
-                            var findDateAcceptance = doc.DocumentNode
+                            // get data from table 'racetable' (under pubblications)
+                            var listOfInfoEntries = doc.DocumentNode
                                 .Descendants("table")
                                 .Where(w => w.HasClass("racetable"))
                                 .SelectMany(s => s.Elements("tr"))
-                                .ToList()
-                                .Find(w => w.Elements("td")?.ToList()[0].Element("span")?.InnerText == "Date of acceptance on a definitive basis by the FCI");
-                            if (findDateAcceptance != null)
-                            {
-                                responseBreed.DateOfAcceptanceOnDefinitiveBasisByTheFci = DateTime.ParseExact(
-                                    findDateAcceptance
-                                        .Elements("td")
-                                        .ToList()[1]
-                                        .Element("span")
-                                        .InnerText
-                                        .Trim(),
-                                    "M/d/yyyy",
-                                    CultureInfo.InvariantCulture
-                                );
-                            }
+                                .ToList();
 
-                            // get official name language
-                            var findOfficialNameLanguage = doc.DocumentNode
-                                .Descendants("table")
-                                .Where(w => w.HasClass("racetable"))
-                                .SelectMany(s => s.Elements("tr"))
-                                .ToList()
-                                .Find(w => w.Elements("td")?.ToList()[0].Element("span")?.InnerText == "Official authentic language");
-                            if (findOfficialNameLanguage != null)
+                            // Iterate entries
+                            listOfInfoEntries.ForEach(fe =>
                             {
-                                responseBreed.OfficialNameLanguage = new ResponseTranslation(
-                                    findOfficialNameLanguage
-                                        .Elements("td")
-                                        .ToList()[1]
-                                        .Element("span")
-                                        .InnerText
-                                        .Trim()
-                                );
-                            }
+                                string entryName = fe.Elements("td")?.ToList()[0].Element("span")?.InnerText;
 
-                            // get date acceptance
-                            var findDatePublication = doc.DocumentNode
-                                .Descendants("table")
-                                .Where(w => w.HasClass("racetable"))
-                                .SelectMany(s => s.Elements("tr"))
-                                .ToList()
-                                .Find(w => w.Elements("td")?.ToList()[0].Element("span")?.InnerText == "Date of publication of the official valid standard");
-                            if (findDatePublication != null)
-                            {
-                                responseBreed.DateOfPubblicationOfTheOfficialValidStandard = DateTime.ParseExact(
-                                    findDatePublication
-                                        .Elements("td")
-                                        .ToList()[1]
-                                        .Element("span")
-                                        .InnerText
-                                        .Trim(),
-                                    "M/d/yyyy",
-                                    CultureInfo.InvariantCulture
-                                );
-                            }
+                                switch (entryName)
+                                {
+                                    // get date acceptance
+                                    case "Date of acceptance on a definitive basis by the FCI":
+                                        responseBreed.DateOfAcceptanceOnDefinitiveBasisByTheFci = DateTime.ParseExact(
+                                            fe.Elements("td")
+                                                .ToList()[1]
+                                                .Element("span")
+                                                .InnerText
+                                                .Trim(),
+                                            "M/d/yyyy",
+                                            CultureInfo.InvariantCulture
+                                        );
+                                        break;
 
-                            // get status
-                            var findStatus = doc.DocumentNode
-                                .Descendants("table")
-                                .Where(w => w.HasClass("racetable"))
-                                .SelectMany(s => s.Elements("tr"))
-                                .ToList()
-                                .Find(w => w.Elements("td")?.ToList()[0].Element("span")?.InnerText == "Breed status");
-                            if (findStatus != null)
-                            {
-                                responseBreed.Status = new ResponseBreedStatus(
-                                    findStatus
-                                        .Elements("td")
-                                        .ToList()[1]
-                                        .Element("span")
-                                        .InnerText
-                                        .Trim()
-                                );
-                            }
+                                    // get official name language
+                                    case "Official authentic language":
+                                        responseBreed.OfficialNameLanguage = new ResponseTranslation(
+                                            fe.Elements("td")
+                                                .ToList()[1]
+                                                .Element("span")
+                                                .InnerText
+                                                .Trim()
+                                        );
+                                        break;
 
-                            // get origin country
-                            var findOriginCountry = doc.DocumentNode
-                                .Descendants("table")
-                                .Where(w => w.HasClass("racetable"))
-                                .SelectMany(s => s.Elements("tr"))
-                                .ToList()
-                                .Find(w => w.Elements("td")?.ToList()[0].Element("span")?.InnerText == "Country of origin of the breed");
-                            if (findOriginCountry != null)
-                            {
-                                responseBreed.OriginCountry = findOriginCountry
-                                    .Elements("td")
-                                    .ToList()[1]
-                                    .Element("span")
-                                    .InnerText
-                                    .Trim();
-                            }
+                                    // get date acceptance
+                                    case "Date of publication of the official valid standard":
+                                        responseBreed.DateOfPubblicationOfTheOfficialValidStandard = DateTime.ParseExact(
+                                            fe.Elements("td")
+                                                .ToList()[1]
+                                                .Element("span")
+                                                .InnerText
+                                                .Trim(),
+                                            "M/d/yyyy",
+                                            CultureInfo.InvariantCulture
+                                        );
+                                        break;
 
-                            // get working trial
-                            var findWotkingTrial = doc.DocumentNode
-                                .Descendants("table")
-                                .Where(w => w.HasClass("racetable"))
-                                .SelectMany(s => s.Elements("tr"))
-                                .ToList()
-                                .Find(w => w.Elements("td")?.ToList()[0].Element("span")?.InnerText == "Working trial");
-                            if (findWotkingTrial != null)
-                            {
-                                responseBreed.WorkingTrial = new ResponseBreedWorkingTrial(
-                                    findWotkingTrial
-                                        .Elements("td")
-                                        .ToList()[1]
-                                        .Element("span")
-                                        .InnerText
-                                        .Trim()
-                                );
-                            }
+                                    // get status
+                                    case "Breed status":
+                                        responseBreed.Status = new ResponseBreedStatus(
+                                            fe.Elements("td")
+                                                .ToList()[1]
+                                                .Element("span")
+                                                .InnerText
+                                                .Trim()
+                                        );
+                                        break;
 
-                            // get date of acceptance on provisional basis by the FCI
-                            var findDateAcceptanceOnProvisionalBasis = doc.DocumentNode
-                                .Descendants("table")
-                                .Where(w => w.HasClass("racetable"))
-                                .SelectMany(s => s.Elements("tr"))
-                                .ToList()
-                                .Find(w => w.Elements("td")?.ToList()[0].Element("span")?.InnerText == "Date of acceptance on a provisional basis by the FCI");
-                            if (findDateAcceptanceOnProvisionalBasis != null)
-                            {
-                                responseBreed.DateOfAcceptanceOnProvisionalBasisByTheFci = DateTime.ParseExact(
-                                    findDateAcceptanceOnProvisionalBasis
-                                        .Elements("td")
-                                        .ToList()[1]
-                                        .Element("span")
-                                        .InnerText
-                                        .Trim(),
-                                    "M/d/yyyy",
-                                    CultureInfo.InvariantCulture
-                                );
-                            }
+                                    // get origin country
+                                    case "Country of origin of the breed":
+                                        responseBreed.OriginCountry = fe
+                                            .Elements("td")
+                                            .ToList()[1]
+                                            .Element("span")
+                                            .InnerText
+                                            .Trim();
+                                        break;
+
+                                    // get working trial
+                                    case "Working trial":
+                                        responseBreed.WorkingTrial = new ResponseBreedWorkingTrial(
+                                            fe.Elements("td")
+                                                .ToList()[1]
+                                                .Element("span")
+                                                .InnerText
+                                                .Trim()
+                                        );
+                                        break;
+
+                                    // get date of acceptance on provisional basis by the FCI
+                                    case "Date of acceptance on a provisional basis by the FCI":
+                                        responseBreed.DateOfAcceptanceOnProvisionalBasisByTheFci = DateTime.ParseExact(
+                                            fe.Elements("td")
+                                                .ToList()[1]
+                                                .Element("span")
+                                                .InnerText
+                                                .Trim(),
+                                            "M/d/yyyy",
+                                            CultureInfo.InvariantCulture
+                                        );
+                                        break;
+
+                                    // get sub-section
+                                    case "Subsection":
+                                        responseBreed.SubSection = responseBreed
+                                            .Section
+                                            .SubSections
+                                            .Find(f => f.OfficialName == fe.Elements("td").ToList()[1].Element("span").InnerText.Trim());
+                                        break;
+
+                                    // get patronage country
+                                    case "Country of patronage of the breed":
+                                        responseBreed.PatronageCountry = fe.Elements("td")
+                                               .ToList()[1]
+                                               .Element("span")
+                                               .InnerText
+                                               .Trim();
+                                        break;
+
+                                    // get development country
+                                    case "Country of development of the breed":
+                                        responseBreed.DevelopmentCountry = fe.Elements("td")
+                                               .ToList()[1]
+                                               .Element("span")
+                                               .InnerText
+                                               .Trim();
+                                        break;
+
+                                    // Choose to not manage
+                                    case "Section":
+                                        break;
+
+                                    default:
+                                        throw new Exception("Entry info name not managed: " + entryName);
+                                }
+                            });
 
                             // get varieties
                             responseBreed.Varieties = new List<ResponseBreedVariety>();

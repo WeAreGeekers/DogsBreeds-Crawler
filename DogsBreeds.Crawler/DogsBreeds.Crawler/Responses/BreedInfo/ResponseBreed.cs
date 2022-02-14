@@ -15,6 +15,11 @@
         public ResponseBreedSection Section { get; set; }
 
         /// <summary>
+        /// Ref to breed sub section
+        /// </summary>
+        public ResponseBreedSubSection SubSection { get; set; }
+
+        /// <summary>
         /// The unique fci code
         /// </summary>
         public string FciCode { get;set; }
@@ -63,6 +68,16 @@
         /// Origin country of breed
         /// </summary>
         public string OriginCountry { get; set; }
+
+        /// <summary>
+        /// Patronage country of breed
+        /// </summary>
+        public string PatronageCountry { get; set; }
+
+        /// <summary>
+        /// Development country of breed
+        /// </summary>
+        public string DevelopmentCountry { get; set; }
 
         /// <summary>
         /// Breed is enable for working trial
