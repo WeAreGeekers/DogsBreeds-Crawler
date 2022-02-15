@@ -1,8 +1,9 @@
-﻿using WeAreGeekers.DogsBreeds.Crawler.Extractors;
+﻿using System.Text.Json;
+using WeAreGeekers.DogsBreeds.Crawler.Extractors;
 using WeAreGeekers.DogsBreeds.Crawler.Responses;
 
 // Extract fci data
 List<ResponseBreedDetailData> listBreedDetailData = FciExtractor.ExtractFromFciBreedDetailData();
 
 // Write breeds.json & csv (how to write array in csv? With '|'? Idk)
-// TODO: 
+File.WriteAllText("./breeds.json", JsonSerializer.Serialize(listBreedDetailData));

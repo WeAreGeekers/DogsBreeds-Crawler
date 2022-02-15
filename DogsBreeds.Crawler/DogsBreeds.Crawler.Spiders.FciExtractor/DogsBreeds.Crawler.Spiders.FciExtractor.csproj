@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>WeAreGeekers.DogsBreeds.Crawler.Spiders.FciExtractor</AssemblyName>
+    <RootNamespace>WeAreGeekers.DogsBreeds.Crawler.Spiders.FciExtractor</RootNamespace>
+    <Authors>Fabrizio Pairone</Authors>
+    <Company>WeAreGeekers</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
+  </ItemGroup>
+
+</Project>
