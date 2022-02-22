@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>WeAreGeekers.DogsBreeds.Crawler</AssemblyName>
+    <RootNamespace>WeAreGeekers.DogsBreeds.Crawler</RootNamespace>
+    <Authors>WeAreGeekers,Fabrizio pairone</Authors>
+    <Company>WeAreGeekers</Company>
+    <Description>DogsBreeds.Crawler project that extract data of dog breeds from many source</Description>
+    <Copyright>WeAreGeekers</Copyright>
+    <RepositoryUrl>https://github.com/WeAreGeekers/DogsBreeds-Crawler</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WeAreGeekers.DogsBreeds.Crawler.Spiders.FCI" Version="1.0.1" />
+  </ItemGroup>
+
+</Project>
