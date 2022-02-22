@@ -5,11 +5,10 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>WeAreGeekers.DogsBreeds.Crawler</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.40" />
+    <ProjectReference Include="..\DogsBreeds.Crawler\DogsBreeds.Crawler.csproj" />
   </ItemGroup>
 
 </Project>
