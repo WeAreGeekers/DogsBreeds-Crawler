@@ -6,7 +6,7 @@
 
 For do that we create this crawler to track information from many source and create an all-in-one exposition with all data tracked.
 
-You can retrieve a complete json updated daily at [this link](https://resources.dogs-breeds.com/crawler/breeds.json).
+You can retrieve a complete json updated daily at [this link](https://storage.googleapis.com/resources.dogs-breeds.com/crawler/breeds.json).
 
 ## Installation
 
