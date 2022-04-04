@@ -14,10 +14,12 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageId>WeAreGeekers.DogsBreeds.Crawler</PackageId>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WeAreGeekers.DogsBreeds.Crawler.Spiders.FCI" Version="1.0.1" />
+    <PackageReference Include="WeAreGeekers.DogsBreeds.Crawler.Spiders.FCI" Version="1.0.2" />
   </ItemGroup>
 
 </Project>
